@@ -1,0 +1,67 @@
+name: job_diagnosis
+description: "诊断 job 异常状态：为什么 PENDING/FAILED/TIMEOUT，分析原因并给出建议"
+version: "1.0"
+
+triggers:
+  - "为什么 job pending"
+  - "job 失败"
+  - "任务排队"
+  - "job stuck"
+  - "为什么不运行"
+
+context_commands:
+  - name: job_detail
+    cmd: "scontrol show job {job_id}"
+    required: true
+    parse: key_value
+
+  - name: job_reason
+    cmd: "squeue -j {job_id} -o '%i %T %R'"
+    required: true
+    parse: table
+
+  - name: node_status
+    cmd: "sinfo -N -l"
+    required: false
+    parse: table
+
+  - name: job_history
+    cmd: "sacct -j {job_id} --format=JobID,State,ExitCode,Elapsed,MaxRSS,NodeList -P"
+    required: false
+    parse: table
+
+# Rule-based quick answers (bypass LLM for common cases)
+rules:
+  - condition: "reason == 'Priority'"
+    response: "Job 在等待优先级调度，前面有更高优先级的任务排队。"
+    severity: low
+
+  - condition: "reason == 'Resources'"
+    response: "请求的资源当前不可用（节点都在忙或资源不足）。"
+    severity: medium
+    next_action: "检查 sinfo 确认可用节点"
+
+  - condition: "reason contains 'NodeDown'"
+    response: "目标节点已下线。"
+    severity: high
+    next_action: "检查哪些节点 down 并尝试恢复"
+
+  - condition: "reason == 'QOSMaxJobsPerUserLimit'"
+    response: "已达到 QOS 允许的最大同时运行 job 数。"
+    severity: low
+    next_action: "等现有 job 完成或取消部分 job"
+
+analysis_prompt: |
+  你是 Slurm 集群运维专家。用户想知道为什么某个 job 状态异常。
+  
+  分析以下信息：
+  {command_outputs}
+  
+  请给出：
+  1. 问题诊断（根本原因）
+  2. 建议操作
+  
+  注意：这个集群有 4 个计算节点（cn01-cn04），每个 1 CPU、900MB 内存。
+  srun 不可用（PMI 兼容性问题），需要用 mpirun。
+  
+  用中文回答，简洁明了。

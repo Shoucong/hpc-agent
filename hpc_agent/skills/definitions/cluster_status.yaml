@@ -1,0 +1,40 @@
+name: cluster_status
+description: "查看集群整体状态：节点状态、队列情况、资源使用"
+version: "1.0"
+
+triggers:
+  - "集群状态"
+  - "集群什么情况"
+  - "节点状态"
+  - "cluster status"
+  - "sinfo"
+
+context_commands:
+  - name: node_overview
+    cmd: "sinfo -N -l"
+    required: true
+    parse: table
+
+  - name: queue_overview
+    cmd: "squeue -o '%.8i %.9P %.12j %.8u %.2t %.10M %.4D %R'"
+    required: true
+    parse: table
+
+  - name: partition_info
+    cmd: "sinfo -o '%.12P %.5a %.10l %.6D %.6t %.12N'"
+    required: false
+    parse: table
+
+analysis_prompt: |
+  你是 HPC 集群运维专家。根据以下 Slurm 命令输出，给用户一个简洁的集群状态摘要。
+  
+  包含以下信息：
+  1. 节点总数及各状态（idle/allocated/drain/down）数量
+  2. 当前运行的 job 数量和排队的 job 数量
+  3. 如果有异常节点（drain/down），特别指出
+  4. 整体资源利用率的粗略评估
+  
+  命令输出：
+  {command_outputs}
+  
+  用中文回答，简洁明了。
