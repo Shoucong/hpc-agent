@@ -121,7 +121,7 @@ hpc_agent/
 |--------|------|--------|
 | `EXECUTOR_MODE` | 命令执行模式：`mock` / `local` / `ssh` | `"ssh"` |
 | `SSH_CONFIG` | SSH 连接信息 | `{"host": "172.16.1.133", "user": "cluster"}` |
-| `DEFAULT_MODEL` | Ollama 模型名称 | `"qwen3.5:9b"` |
+| `DEFAULT_MODEL` | Ollama 模型名称 | `"gemma4:e4b"` |
 | `MAX_REACT_ITERATIONS` | ReAct 最大循环次数 | `3` |
 
 ## 测试环境
