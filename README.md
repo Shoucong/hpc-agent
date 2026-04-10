@@ -46,7 +46,7 @@ conda activate hpc-agent
 pip install -r requirements.txt
 
 # 拉取模型
-ollama pull qwen3.5:9b
+ollama pull gemma4:e4b
 
 # 配置连接（编辑 config.py）
 # EXECUTOR_MODE = "ssh" / "mock" / "local"
