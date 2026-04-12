@@ -10,7 +10,6 @@ SSH_CONFIG = {
 }
 
 # === LLM ===
-DEFAULT_MODEL = "gemma4:e4b"
-
+DEFAULT_MODEL = "batiai/gemma4-e4b:q4"
 # === ReAct ===
 MAX_REACT_ITERATIONS = 3

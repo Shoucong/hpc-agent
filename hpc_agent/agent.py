@@ -3,6 +3,7 @@
 import time
 from langgraph.graph import StateGraph, END
 from hpc_agent.state import AgentState
+from hpc_agent.nodes.rewriter import rewriter_node
 from hpc_agent.nodes.router import router_node
 from hpc_agent.nodes.context import context_node
 from hpc_agent.nodes.analyzer import analyzer_node
@@ -38,6 +39,7 @@ def build_graph() -> StateGraph:
     graph = StateGraph(AgentState)
 
     # Nodes
+    graph.add_node("rewriter", timed_node("Rewriter", rewriter_node))
     graph.add_node("router", timed_node("Router", router_node))
     graph.add_node("context", timed_node("Context", context_node))
     graph.add_node("analyzer", timed_node("Analyzer", analyzer_node))
@@ -45,7 +47,8 @@ def build_graph() -> StateGraph:
     graph.add_node("memory", timed_node("Memory", memory_node))
 
     # Flow
-    graph.set_entry_point("router")
+    graph.set_entry_point("rewriter")
+    graph.add_edge("rewriter", "router")
 
     graph.add_conditional_edges(
         "router",

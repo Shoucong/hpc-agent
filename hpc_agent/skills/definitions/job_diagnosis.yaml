@@ -63,5 +63,7 @@ analysis_prompt: |
   
   注意：这个集群有 4 个计算节点（cn01-cn04），每个 1 CPU、900MB 内存。
   srun 不可用（PMI 兼容性问题），需要用 mpirun。
+
+  注意 Slurm 时间格式：M:SS 表示分:秒（如 4:51 = 4分51秒），H:MM:SS 表示时:分:秒，D-HH:MM:SS 表示天-时:分:秒。
   
   用中文回答，简洁明了。

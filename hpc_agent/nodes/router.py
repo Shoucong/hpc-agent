@@ -12,6 +12,7 @@ KEYWORD_RULES = [
     (r"(job|任务|作业).*(pending|失败|fail|timeout|stuck|排队|为什么|怎么)", "job_diagnosis", "diagnose"),
     (r"(为什么|why).*(job|任务|作业)", "job_diagnosis", "diagnose"),
     (r"(drain|down|故障|恢复)", "cluster_status", "diagnose"),
+    (r"(job|任务|作业|Job ID)\s*\d+", "job_diagnosis", "diagnose"),
 ]
 
 ROUTER_PROMPT = """你是一个 HPC 集群运维助手的路由器。
@@ -56,6 +57,10 @@ def router_node(state: AgentState) -> dict:
     skill_list = get_skill_summary(skills)
     prompt = ROUTER_PROMPT.format(skill_list=skill_list, user_input=user_input)
     result = llm_json_call(prompt)
+
+    if "error" in result:
+        print(f"  [Router-Error] JSON parse failed, fallback to none")
+        return {"selected_skill": "none", "intent": "chat"}
 
     return {
         "selected_skill": result.get("skill", "none"),
