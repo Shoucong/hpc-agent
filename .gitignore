@@ -7,3 +7,4 @@ build/
 *.tar.gz
 .DS_Store
 data/
+docs/hpc_agent_resume_upgrade_plan.md
